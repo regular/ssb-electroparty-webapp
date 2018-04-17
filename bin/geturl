@@ -1,0 +1,26 @@
+#!/usr/bin/env node
+const fs = require('fs')
+const path = require('path')
+const bootloader = require('../bootloader')
+const sbotConfig = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'config')))
+const client = require('ssb-client')
+
+const manifest = JSON.parse(fs.readFileSync(path.join(process.env.HOME, `.${sbotConfig.appName}`, 'manifest.json')))
+
+function print() {
+  console.error.apply(console, arguments)
+}
+
+client(Object.assign({}, sbotConfig, {manifest}), (err, ssb) => {
+  if (err) return console.error(err)
+  ssb.ws.getAddress( (err, address) => {
+    if (err) return console.error(err)
+    sbotConfig.wsAddress = address
+    bootloader(ssb, print, {manifest, sbotConfig}, (err, url, kv) => {
+      if (err) return console.error(err)
+      console.log(url)
+      process.exit(0)
+    })
+  })
+})
+
