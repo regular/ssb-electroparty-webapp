@@ -2,10 +2,16 @@
 const fs = require('fs')
 const path = require('path')
 const bootloader = require('../bootloader')
-const sbotConfig = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'config')))
+
+let configPath = path.join(process.cwd(), 'config')
+if (process.argv.length > 2) {
+  configPath = process.argv[2]
+}
+
+const sbotConfig = JSON.parse(fs.readFileSync(configPath))
 const client = require('ssb-client')
 
-const manifest = JSON.parse(fs.readFileSync(path.join(process.env.HOME, `.${sbotConfig.appName}`, 'manifest.json')))
+const manifest = JSON.parse(fs.readFileSync( (sbotConfig.path || `${process.env.HOME}/.${sbotConfig.appName}`) + '/manifest.json'))
 
 function print() {
   console.error.apply(console, arguments)
