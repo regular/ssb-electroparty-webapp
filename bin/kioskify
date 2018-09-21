@@ -1,0 +1,14 @@
+#!/usr/bin/env node
+
+if (process.argv.length<3) {
+  console.error('Usage: kioskify CONFIGFILE')
+  process.exit(1)
+}
+
+const configPath = process.argv[2]
+
+const fs = require('fs')
+const o = JSON.parse(fs.readFileSync(configPath))
+o.cms.kiosk = true
+o.cms['view-mode'] = 'no-ui'
+fs.writeFileSync(configPath, JSON.stringify(o, null, 2))
